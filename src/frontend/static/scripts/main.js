@@ -110,8 +110,7 @@ document.addEventListener("DOMContentLoaded", () => {
         refreshBtn.classList.remove('loading');
     }
 
-    // Wraps email HTML in a document that forces readable colors (white bg, dark text)
-    // and makes all links open in a new tab (target="_blank" injected into each <a>).
+    // wrap email body so it displays readable and links open in new tab
     function wrapEmailBodyForReadability(html) {
         const style = `
             html, body, body * {
@@ -121,10 +120,9 @@ document.addEventListener("DOMContentLoaded", () => {
             a { color: #64317f !important; }
             body { font-family: inherit; padding: 0.5rem 0.75rem; margin: 0; }
         `;
-        // Force every link to open in new tab (base target is often ignored in iframe/srcdoc)
-        let htmlWithExternalLinks = html.replace(/\btarget\s*=\s*["']?(?:_self|_parent|_top)["']?/gi, 'target="_blank"');
-        htmlWithExternalLinks = htmlWithExternalLinks.replace(/<a\s+(?![^>]*\btarget\s*=)/gi, '<a target="_blank" rel="noopener noreferrer" ');
-        return `<!DOCTYPE html><html><head><meta charset="utf-8"><style>${style}</style></head><body>${htmlWithExternalLinks}</body></html>`;
+        let bodyHtml = html.replace(/\btarget\s*=\s*["']?(?:_self|_parent|_top)["']?/gi, 'target="_blank"');
+        bodyHtml = bodyHtml.replace(/<a\s+(?![^>]*\btarget\s*=)/gi, '<a target="_blank" rel="noopener noreferrer" ');
+        return `<!DOCTYPE html><html><head><meta charset="utf-8"><style>${style}</style></head><body>${bodyHtml}</body></html>`;
     }
 
     // render the inbox in the inbox element
