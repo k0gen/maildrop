@@ -1,0 +1,16 @@
+.git
+.github
+.gitignore
+.env
+*.md
+docs
+scripts
+pictures
+__pycache__
+.venv
+venv
+*.pyc
+.dockerignore
+Dockerfile
+docker-compose.yml
+inbox.json
