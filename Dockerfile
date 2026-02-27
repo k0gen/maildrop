@@ -1,4 +1,4 @@
-FROM python:3.9-alpine AS builder
+FROM python:3.13-alpine AS builder
 
 RUN apk add --no-cache build-base python3-dev patchelf
 
