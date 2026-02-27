@@ -30,11 +30,15 @@ WORKDIR /app
 
 COPY --from=builder /app/web_app .
 
-RUN adduser -D appuser
+RUN adduser -D appuser \
+    && mkdir -p /app/data \
+    && chown -R appuser:appuser /app
+
 USER appuser
 
 EXPOSE 5000 2500
 
 ENV SMTP_PORT=2500
+ENV INBOX_FILE_NAME=/app/data/inbox.json
 
 CMD ["./web_app"]

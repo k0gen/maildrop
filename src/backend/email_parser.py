@@ -20,8 +20,8 @@ def extract_email_address(field: str) -> str:
 def email_bytes_to_json(data: bytes) -> dict:
     msg = BytesParser().parsebytes(data)
     
-    to_field = extract_email_address(msg.get("To", "")).lower()
-    from_field = extract_email_address(msg.get("From", "")).lower()
+    to_field = extract_email_address(str(msg.get("To", ""))).lower()
+    from_field = extract_email_address(str(msg.get("From", ""))).lower()
     
     current_timestamp = int(time.time())
 
@@ -39,11 +39,19 @@ def email_bytes_to_json(data: bytes) -> dict:
     for part in msg.walk():
         content_type = part.get_content_type()
         if content_type == "text/plain" or content_type == "text/html":
-            email_dict["Body"] = part.get_payload(decode=True).decode(part.get_content_charset() or "utf-8")
+            payload = part.get_payload(decode=True)
+            if payload is None:
+                payload = b""
+            if not isinstance(payload, bytes):
+                payload = b""
+            try:
+                charset = part.get_content_charset() or "utf-8"
+                email_dict["Body"] = payload.decode(charset, errors="replace")
+            except (LookupError, TypeError):
+                email_dict["Body"] = payload.decode("utf-8", errors="replace")
             if content_type == "text/plain":
                 email_dict["ContentType"] = "Text"
             if content_type == "text/html":
                 email_dict["ContentType"] = "HTML"
-
 
     return email_dict
