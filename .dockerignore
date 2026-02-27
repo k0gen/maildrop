@@ -1,0 +1,40 @@
+# Git
+.git
+.gitignore
+
+# Docker
+Dockerfile*
+.dockerignore
+docker-compose*.yml
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+.env
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Tests and scripts (not needed in production)
+scripts/
+tests/
+test_*.py
+
+# Documentation
+*.md
+docs/
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
