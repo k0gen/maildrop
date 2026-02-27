@@ -1,0 +1,10 @@
+services:
+  maildrop:
+    build: .
+    container_name: maildrop
+    ports:
+      - "5001:5000"   # host:container – web UI na http://localhost:5001
+      - "2525:2500"   # SMTP (kontener 2500). Na serwerze: użyj "25:2500" dla standardowego portu 25
+    environment:
+      - DOMAIN=localhost
+    restart: "no"

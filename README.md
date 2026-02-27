@@ -11,6 +11,7 @@
 - [Table of Contents](#table-of-contents)
 - [About The Project](#about-the-project)
   - [Features](#features)
+- [Changelog (this fork)](#changelog-this-fork)
 - [Getting Started](#getting-started)
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
@@ -24,7 +25,9 @@
 
 ## About The Project
 
-Maildrop is a self hostable and easy to use email service that allows you to receive emails on any address on your domain.  
+Maildrop is a self hostable and easy to use email service that allows you to receive emails on any address on your domain.
+
+**This repository is a fork** with additional changes (Python 3.13, asyncio-based SMTP thread, Nuitka onefile Docker build). See [CHANGELOG.md](CHANGELOG.md) for differences from the original [haileyydev/maildrop](https://github.com/haileyydev/maildrop).  
 
 It is perfect for:
 - People who want to easily use multiple email addresses.
@@ -42,13 +45,17 @@ It is perfect for:
 - [x] (Optional) Sending Emails  
 [Set up sending](#sending)
 
+### Changelog (this fork)
+
+Differences from the original [haileyydev/maildrop](https://github.com/haileyydev/maildrop) are listed in [CHANGELOG.md](CHANGELOG.md).
+
 ## Getting Started
 
 If you wish to install maildrop and run it with python, follow this guide, if you wish to install it with docker instead, then proceed to [Running with Docker](#running-with-docker).
 
 ### Prerequisites
 
-- Python 3
+- Python 3.13
 - pip
 
 ### Installation
@@ -56,7 +63,7 @@ If you wish to install maildrop and run it with python, follow this guide, if yo
 1.  **Clone the repository**
 
     ```bash
-    git clone https://github.com/haileyydev/maildrop.git
+    git clone https://github.com/k0gen/maildrop.git
     cd maildrop
     ```
 
@@ -76,42 +83,46 @@ If you wish to install maildrop and run it with python, follow this guide, if yo
 4.  **Run the application**
 
     ```bash
-    sudo python app.py
+    python app.py
     ```
 
-Maildrop will be running on port 5000 and the smtp server on port 25.
+Maildrop will be running on port 5000 (web) and the SMTP server on port **2500** by default.
 
-**The application must be run as root for the SMTP server to work**
+**Why not root and port 25?** In the original project, the app had to run as root to bind to port 25 (privileged port). In this fork the default SMTP port is **2500**, so you can run without `sudo`. Your MX can still point to this host: either configure your MTA to relay to port 2500, or run with privileges and set `SMTP_PORT=25` (e.g. `sudo SMTP_PORT=25 python app.py` or in Docker map `25:2500` and use a container that can bind to 25 if needed).
 
 ### Running with docker
 
-Alternatively, you can run maildrop inside of a docker container using the official docker image.
+This fork builds a single-binary image with Nuitka (multi-stage Docker build). No pre-built image is published; build from source.
 
-Use this command to run maildrop in a docker container:
+**Using docker compose** (recommended):
+
+```bash
+docker compose up -d
 ```
-sudo docker run \
-  -d \
-  --restart unless-stopped \
-  --name maildrop \
-  -p 5000:5000 \
-  -p 25:25 \
-  -e DOMAIN="yourdomain.com" \
-  haileyydev/maildrop:latest  
-```
-Or if you prefer docker compose, Add this to your compose.yml file:
-```
+
+Example `docker-compose.yml` (see repo for full file):
+
+```yaml
 services:
   maildrop:
-    image: haileyydev/maildrop:latest
+    build: .
     container_name: maildrop
-    restart: unless-stopped
     ports:
-      - "5000:5000"
-      - "25:25"
+      - "5001:5000"   # Web UI
+      - "2525:2500"   # SMTP (use "25:2500" on a server for port 25)
     environment:
       - DOMAIN=yourdomain.com
+    restart: unless-stopped
 ```
-and then start it: `sudo docker compose up -d`
+
+**Using docker run** (build first):
+
+```bash
+docker build -t maildrop .
+docker run -d --name maildrop -p 5000:5000 -p 25:2500 -e DOMAIN=yourdomain.com maildrop
+```
+
+Note: the app listens on port **2500** for SMTP inside the container; map to host `25` only if you need standard SMTP.
 
 
 ## Connecting to your domain  
